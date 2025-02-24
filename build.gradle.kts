@@ -16,6 +16,7 @@ dependencies {
     implementation("net.dv8tion:JDA:5.3.0") // JDA Library
     implementation("org.xerial:sqlite-jdbc:3.49.1.0") // SQLite Driver
     implementation("com.google.code.gson:gson:2.12.1") // Gson
+    implementation("org.reflections:reflections:0.10.2") // Reflections
 
 }
 

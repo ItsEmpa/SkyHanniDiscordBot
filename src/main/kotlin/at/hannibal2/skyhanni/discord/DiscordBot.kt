@@ -1,20 +1,38 @@
 package at.hannibal2.skyhanni.discord
 
+import at.hannibal2.skyhanni.discord.commands.CommandHandler
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.GatewayIntent
 import java.util.Scanner
 
-class DiscordBot(private val config: BotConfig) : ListenerAdapter() {
+object DiscordBot : ListenerAdapter() {
+    private lateinit var config: BotConfig
+
+    fun setConfig(config: BotConfig): DiscordBot {
+        this.config = config
+        return this
+    }
+
+    init {
+        CommandHandler.init()
+    }
+
+    val prefix: String get() = config.prefix
+    val botCommandChannelId: String get() = config.botCommandChannelId
+
+    private val regex = "\\s+".toRegex()
+
     override fun onMessageReceived(event: MessageReceivedEvent) {
-        // fix working on other servers
         if (event.guild.id != config.allowedServerId) return
 
         val message = event.message.contentRaw.trim()
         val args = message.split(" ", limit = 3)
 
         if (event.author.isBot) return
+
+        CommandHandler.process(event.channel, event.author, event.message)
 
         fun logAction(action: String) {
             val author = event.author
@@ -128,7 +146,7 @@ fun main() {
     val token = config.token
 
     val jda = with(JDABuilder.createDefault(token)) {
-        addEventListeners(DiscordBot(config))
+        addEventListeners(DiscordBot.setConfig(config))
         enableIntents(GatewayIntent.MESSAGE_CONTENT)
     }.build()
     jda.awaitReady()

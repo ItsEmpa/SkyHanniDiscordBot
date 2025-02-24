@@ -32,6 +32,8 @@ object Database {
         return updated
     }
 
+    fun containsKeyword(keyword: String): Boolean = keywordCache.containsKey(keyword.lowercase())
+
     fun getResponse(keyword: String): String? = keywordCache[keyword.lowercase()]
 
     fun deleteKeyword(keyword: String): Boolean {
