@@ -13,4 +13,8 @@ object DiscordUtils {
 
     fun <T> T.equalsOneOf(vararg values: T): Boolean = values.any { it == this }
 
+    fun sendMessageToBotChannel(message: String) {
+        DiscordBot.jda.getTextChannelById(DiscordBot.botCommandChannelId)?.send(message)
+    }
+
 }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.discord.commands
 
 import at.hannibal2.skyhanni.discord.DiscordBot
+import at.hannibal2.skyhanni.discord.DiscordUtils.equalsOneOf
 import at.hannibal2.skyhanni.discord.DiscordUtils.replyWith
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
@@ -12,6 +13,8 @@ object CommandHandler {
 
     private val commands = mutableMapOf<String, AbstractCommand>()
     private val commandAliases = mutableMapOf<String, AbstractCommand>()
+
+    fun getCommands(): List<AbstractCommand> = commands.values.toList()
 
     private val regex = "\\s+".toRegex()
 
@@ -31,8 +34,9 @@ object CommandHandler {
 
         if (command == null) {
             val tagCommand = Tags.getTag(first) ?: return
-            val shouldDelete = inputMessage.referencedMessage
+            val shouldDelete = input.getOrNull(1)?.split(regex, limit = 2)?.firstOrNull().equalsOneOf("-s", "-d")
             inputMessage.replyWith(tagCommand)
+            Tags.replyTo(channel, inputMessage, shouldDelete, tagCommand)
             return
         }
         val args = input.getOrNull(1)?.split(regex).orEmpty()

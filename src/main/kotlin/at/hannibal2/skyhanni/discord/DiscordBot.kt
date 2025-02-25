@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.discord
 
+import at.hannibal2.skyhanni.discord.DiscordUtils.equalsOneOf
 import at.hannibal2.skyhanni.discord.commands.CommandHandler
+import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
@@ -9,6 +11,8 @@ import java.util.Scanner
 
 object DiscordBot : ListenerAdapter() {
     private lateinit var config: BotConfig
+
+    lateinit var jda: JDA
 
     fun setConfig(config: BotConfig): DiscordBot {
         this.config = config
@@ -145,24 +149,22 @@ fun main() {
     val config = ConfigLoader.load("config.json")
     val token = config.token
 
+    val bot = DiscordBot.setConfig(config)
     val jda = with(JDABuilder.createDefault(token)) {
-        addEventListeners(DiscordBot.setConfig(config))
+        addEventListeners(DiscordBot)
         enableIntents(GatewayIntent.MESSAGE_CONTENT)
     }.build()
+    bot.jda = jda
     jda.awaitReady()
 
-    fun sendMessageToBotChannel(message: String) {
-        jda.getTextChannelById(config.botCommandChannelId)?.sendMessage(message)?.queue()
-    }
-
-    sendMessageToBotChannel("I'm awake \uD83D\uDE42")
+    DiscordUtils.sendMessageToBotChannel("I'm awake \uD83D\uDE42")
 
     Thread {
         val scanner = Scanner(System.`in`)
         while (scanner.hasNextLine()) {
             val input = scanner.nextLine().trim().lowercase()
-            if (input in listOf("close", "stop", "exit", "end")) {
-                sendMessageToBotChannel("Manually shutting down \uD83D\uDC4B")
+            if (input.equalsOneOf("close", "stop", "exit", "end")) {
+                DiscordUtils.sendMessageToBotChannel("Manually shutting down \uD83D\uDC4B")
                 jda.shutdown()
                 break
             }
@@ -170,6 +172,6 @@ fun main() {
     }.start()
 
     Runtime.getRuntime().addShutdownHook(Thread {
-        sendMessageToBotChannel("I am the shutdown hook and I say bye \uD83D\uDC4B")
+        DiscordUtils.sendMessageToBotChannel("I am the shutdown hook and I say bye \uD83D\uDC4B")
     })
 }

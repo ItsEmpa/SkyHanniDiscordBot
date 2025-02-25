@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.discord.commands
 
+import at.hannibal2.skyhanni.discord.DiscordBot
 import at.hannibal2.skyhanni.discord.DiscordUtils.equalsOneOf
 import at.hannibal2.skyhanni.discord.DiscordUtils.error
 import at.hannibal2.skyhanni.discord.DiscordUtils.replyWith
@@ -76,13 +77,14 @@ class TagCommand : AbstractCommand() {
     }
 
     override fun commandUsage(): String {
+        val prefix = DiscordBot.prefix
         return """
             **Tag Command**
-            `!tag add <tag> <content>` - Add a new tag
-            `!tag delete <tag>` - Delete a tag
-            `!tag edit <tag> <content>` - Edit a tag
-            `!tag list` - List all tags
-            `!tag <tag>` - Get a tag
+            `${prefix}tag add <tag> <content>` - Add a new tag
+            `${prefix}tag delete <tag>` - Delete a tag
+            `${prefix}tag edit <tag> <content>` - Edit a tag
+            `${prefix}tag list` - List all tags
+            `${prefix}tag <tag>` - Get a tag
         """.trimIndent()
     }
 
